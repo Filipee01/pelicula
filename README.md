@@ -35,7 +35,7 @@ O botão "Estruturas", no topo, troca o catálogo por uma tela feita para a apre
 aba por estrutura. Cada aba lista as modificações (o que a clássica faz e o que a nossa faz, com
 o trecho do código) e tem demonstrações que rodam sobre as estruturas reais do catálogo:
 
-- **Lista de gêneros.** Os nós encadeados; clicar em um mostra a posição em que estava, as
+- **Lista com movimentação ao início.** Os nós encadeados dos gêneros; clicar em um mostra a posição em que estava, as
   comparações e a ida para o início.
 - **Lista com saltos.** O caminho da busca desenhado nível a nível, comparando a busca clássica,
   a truncada e a sequencial; o acesso ao k-ésimo filme com a soma das larguras dos saltos; e a

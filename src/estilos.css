@@ -259,7 +259,7 @@ p {
   grid-area: generos;
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 10px;
   padding: 10px 24px 12px;
   background: var(--superficie);
   border-bottom: 1px solid var(--borda);
@@ -293,6 +293,20 @@ p {
 }
 .generos li {
   flex: none;
+}
+/* setas para andar pela faixa, uma em cada ponta */
+.generos .seta {
+  flex: none;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  font-size: 20px;
+  line-height: 1;
+}
+.generos .seta:hover {
+  background: var(--destaque);
+  border-color: var(--destaque);
 }
 .generos button {
   display: flex;

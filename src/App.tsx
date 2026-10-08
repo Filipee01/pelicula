@@ -35,6 +35,26 @@ export default function App() {
   const generos = acervo?.generos.paraVetor() ?? [];
   useFlip(listaGenerosRef, generos.map((g) => g.id).join());
 
+  // A faixa de gêneros não cabe inteira na tela: a roda do mouse, que normalmente
+  // rola para baixo, aqui rola a faixa para o lado.
+  useEffect(() => {
+    const faixa = listaGenerosRef.current;
+    if (!faixa) return;
+    const rolar = (e: WheelEvent) => {
+      if (e.deltaY === 0 || faixa.scrollWidth <= faixa.clientWidth) return;
+      e.preventDefault();
+      faixa.scrollLeft += e.deltaY;
+    };
+    faixa.addEventListener("wheel", rolar, { passive: false });
+    return () => faixa.removeEventListener("wheel", rolar);
+  }, [acervo, tela]);
+
+  // setas nas pontas da faixa: andam uns 70% da largura visível de cada vez
+  function rolarGeneros(direcao: -1 | 1) {
+    const faixa = listaGenerosRef.current;
+    faixa?.scrollBy({ left: direcao * faixa.clientWidth * 0.7, behavior: "smooth" });
+  }
+
   if (erro) {
     return (
       <div className="tela-cheia">
@@ -122,6 +142,9 @@ export default function App() {
             <span className="rotulo">
               Gêneros <em>lista com movimentação ao início</em>
             </span>
+            <button className="seta" onClick={() => rolarGeneros(-1)} aria-label="Gêneros anteriores">
+              ‹
+            </button>
             <ul ref={listaGenerosRef}>
               {generos.map((g, i) => (
                 <li key={g.id} data-flip={g.id}>
@@ -133,6 +156,9 @@ export default function App() {
                 </li>
               ))}
             </ul>
+            <button className="seta" onClick={() => rolarGeneros(1)} aria-label="Mais gêneros">
+              ›
+            </button>
           </nav>
           <Galeria key={genero.id} genero={genero} aoAbrir={abrirFilme} />
           <PainelEstruturas

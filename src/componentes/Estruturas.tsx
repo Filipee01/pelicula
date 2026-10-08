@@ -20,7 +20,7 @@ interface Props {
 }
 
 const ABAS: { id: Aba; numero: number; nome: string; tipo: string }[] = [
-  { id: "lista", numero: 1, nome: "Lista de gêneros", tipo: "movimentação ao início" },
+  { id: "lista", numero: 1, nome: "Lista com movimentação ao início", tipo: "gêneros do catálogo" },
   { id: "saltos", numero: 2, nome: "Lista com saltos", tipo: "filmes de cada gênero" },
   { id: "arvore", numero: 3, nome: "Árvore afunilada", tipo: "busca por título" },
 ];
