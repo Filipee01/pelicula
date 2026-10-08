@@ -20,7 +20,7 @@ interface Props {
 }
 
 const ABAS: { id: Aba; numero: number; nome: string; tipo: string }[] = [
-  { id: "lista", numero: 1, nome: "Lista com movimentação ao início", tipo: "gêneros do catálogo" },
+  { id: "lista", numero: 1, nome: "Lista encadeada com movimentação ao início", tipo: "gêneros do catálogo" },
   { id: "saltos", numero: 2, nome: "Lista com saltos", tipo: "filmes de cada gênero" },
   { id: "arvore", numero: 3, nome: "Árvore afunilada", tipo: "busca por título" },
 ];
@@ -61,7 +61,7 @@ function Numero(props: { valor: string; rotulo: string; destaque?: boolean }) {
   );
 }
 
-/* ---------- 1. lista com movimentação ao início ---------- */
+/* ---------- 1. lista encadeada com movimentação ao início ---------- */
 
 function AbaLista({ acervo, genero, ultimoAcesso, aoEscolherGenero }: Props) {
   const ref = useRef<HTMLOListElement>(null);

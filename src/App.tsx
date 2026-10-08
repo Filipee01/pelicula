@@ -140,7 +140,7 @@ export default function App() {
         <>
           <nav className="generos">
             <span className="rotulo">
-              Gêneros <em>lista com movimentação ao início</em>
+              Gêneros <em>lista encadeada com movimentação ao início</em>
             </span>
             <button className="seta" onClick={() => rolarGeneros(-1)} aria-label="Gêneros anteriores">
               ‹
