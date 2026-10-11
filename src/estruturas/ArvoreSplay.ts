@@ -34,6 +34,16 @@ export interface OperacaoSplay {
   passos: PassoSplay[];
 }
 
+// Um quadro da animação das rotações: o pedaço da árvore em volta do nó, antes ou
+// depois de um passo do afunilamento. Serve só para a tela; não muda o algoritmo.
+export interface QuadroSplay<V> {
+  passo: PassoSplay;
+  momento: "antes" | "depois";
+  // profundidade do nó que está subindo, neste quadro
+  profundidade: number;
+  nos: { valor: V; nivel: number; indice: number; papel?: "no" | "pai" | "avo" }[];
+}
+
 export interface NoNoTopo<K, V> {
   no: NoSplay<K, V>;
   nivel: number;
@@ -46,6 +56,10 @@ export class ArvoreSplay<K, V> {
   tamanho = 0;
   // guarda o que a última busca ou inserção fez, só para mostrar na tela
   ultimaOperacao: OperacaoSplay = { comparacoes: 0, profundidade: 0, passos: [] };
+  // quando ligado, o afunilamento guarda um "antes" e um "depois" de cada passo
+  // (usado só pela animação da tela Estruturas)
+  gravarQuadros = false;
+  quadros: QuadroSplay<V>[] = [];
 
   constructor(private comparar: (a: K, b: K) => number) {}
 
@@ -73,26 +87,64 @@ export class ArvoreSplay<K, V> {
   // Devolve a lista dos passos só para a tela mostrar.
   private afunilar(x: NoSplay<K, V>): PassoSplay[] {
     const passos: PassoSplay[] = [];
+    if (this.gravarQuadros) this.quadros = [];
+    let profundidade = this.gravarQuadros ? this.profundidadeDe(x) : 0;
     while (x.pai) {
       const p = x.pai;
       const avo = p.pai;
-      if (!avo) {
+      const passo: PassoSplay = !avo ? "zig" : (avo.esq === p) === (p.esq === x) ? "zig-zig" : "zig-zag";
+      if (this.gravarQuadros) this.gravarQuadro(passo, "antes", profundidade, avo ?? p, x, p, avo);
+
+      if (passo === "zig") {
         // o pai é a raiz
         this.rotacionar(x);
-        passos.push("zig");
-      } else if ((avo.esq === p) === (p.esq === x)) {
+      } else if (passo === "zig-zig") {
         // x e o pai estão do mesmo lado
         this.rotacionar(p);
         this.rotacionar(x);
-        passos.push("zig-zig");
       } else {
         // x e o pai estão em lados opostos
         this.rotacionar(x);
         this.rotacionar(x);
-        passos.push("zig-zag");
       }
+      passos.push(passo);
+
+      profundidade -= passo === "zig" ? 1 : 2;
+      if (this.gravarQuadros) this.gravarQuadro(passo, "depois", profundidade, x, x, p, avo);
     }
     return passos;
+  }
+
+  private profundidadeDe(x: NoSplay<K, V>): number {
+    let d = 0;
+    for (let y = x.pai; y; y = y.pai) d++;
+    return d;
+  }
+
+  // fotografa 4 níveis a partir de "topo", marcando o nó que sobe, o pai e o avô
+  private gravarQuadro(
+    passo: PassoSplay,
+    momento: "antes" | "depois",
+    profundidade: number,
+    topo: NoSplay<K, V>,
+    x: NoSplay<K, V>,
+    p: NoSplay<K, V>,
+    avo: NoSplay<K, V> | null,
+  ): void {
+    const papel = (n: NoSplay<K, V>) => (n === x ? "no" : n === p ? "pai" : n === avo ? "avo" : undefined);
+    const nos: QuadroSplay<V>["nos"] = [];
+    let fila = [{ no: topo, nivel: 0, indice: 0 }];
+    while (fila.length) {
+      const proxima: typeof fila = [];
+      for (const item of fila) {
+        nos.push({ valor: item.no.valor, nivel: item.nivel, indice: item.indice, papel: papel(item.no) });
+        if (item.nivel === 3) continue;
+        if (item.no.esq) proxima.push({ no: item.no.esq, nivel: item.nivel + 1, indice: item.indice * 2 });
+        if (item.no.dir) proxima.push({ no: item.no.dir, nivel: item.nivel + 1, indice: item.indice * 2 + 1 });
+      }
+      fila = proxima;
+    }
+    this.quadros.push({ passo, momento, profundidade, nos });
   }
 
   // desce pela árvore procurando a chave; devolve o nó dela ou o último visitado

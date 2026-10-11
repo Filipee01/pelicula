@@ -664,3 +664,60 @@
     transform: translateY(-8px) scale(0.9);
   }
 }
+
+/* rotações da árvore afunilada, passo a passo */
+.rotacoes {
+  display: grid;
+  gap: 12px;
+  margin-top: 6px;
+  padding: 16px;
+  border-radius: 14px;
+  background: var(--fundo);
+}
+.rotacoes h4 {
+  margin: 0;
+  font: 700 17px var(--titulo);
+}
+.legenda-rotacao {
+  display: grid;
+  gap: 3px;
+  color: var(--suave);
+}
+.legenda-rotacao b {
+  color: var(--texto);
+  font: 700 18px var(--titulo);
+}
+.legenda-rotacao span:first-of-type {
+  color: var(--ouro);
+}
+.legenda-rotacao strong {
+  color: var(--texto);
+}
+.arvore.movel .no {
+  transition:
+    left 0.75s cubic-bezier(0.2, 0.8, 0.2, 1),
+    top 0.75s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.arvore .papel {
+  position: absolute;
+  top: -16px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font: normal 600 10px/15px var(--corpo);
+  white-space: nowrap;
+}
+.arvore .papel-no .papel {
+  background: var(--ouro);
+  color: #1b1508;
+}
+.arvore .papel-pai .papel {
+  background: #7fd1ff;
+  color: #0a2030;
+}
+.arvore .papel-avo .papel {
+  background: #b9a4ff;
+  color: #1a1030;
+}
+.arvore .papel-no img {
+  box-shadow: 0 0 0 2.5px var(--ouro), 0 0 16px rgba(255, 200, 87, 0.5);
+}

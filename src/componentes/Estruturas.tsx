@@ -1,7 +1,7 @@
 import { ReactNode, useMemo, useRef, useState } from "react";
 import { numero } from "../App";
 import { Acervo, Filme, Genero, aPartirDoAno, normalizar, urlPoster } from "../dados";
-import { OperacaoSplay } from "../estruturas/ArvoreSplay";
+import { OperacaoSplay, PassoSplay, QuadroSplay } from "../estruturas/ArvoreSplay";
 import { AcessoLista } from "../estruturas/ListaMTF";
 import { NoSkip, Salto } from "../estruturas/SkipList";
 import { useFlip } from "../useFlip";
@@ -460,6 +460,54 @@ interface Afunilamento {
   operacao: OperacaoSplay;
   antes: NoDesenho[];
   depois: NoDesenho[];
+  // pedaços da árvore antes e depois de cada passo, para a animação das rotações
+  quadros: QuadroSplay<Filme>[];
+}
+
+const EXPLICA_PASSO: Record<PassoSplay, string> = {
+  zig: "o pai é a raiz: uma rotação simples sobe o nó um nível",
+  "zig-zig": "nó e pai do mesmo lado: gira primeiro o pai, depois o nó; o nó sobe dois níveis",
+  "zig-zag": "nó e pai em lados opostos: gira o nó duas vezes; o nó sobe dois níveis",
+};
+
+// Mostra o afunilamento passo a passo: para cada rotação, o pedaço da árvore em volta
+// do nó antes e depois dela. Os pôsteres deslizam para as posições novas.
+function RotacoesPassoAPasso({ ultimo }: { ultimo: Afunilamento }) {
+  const { quadros } = ultimo;
+  const anim = usePassoAPasso(quadros.length, ultimo, { intervalo: 1300 });
+  if (quadros.length === 0) return null;
+  const i = Math.max(0, anim.passo - 1);
+  const quadro = quadros[i];
+  const numeroPasso = Math.floor(i / 2) + 1;
+  const nos: NoDesenho[] = quadro.nos.map((n) => ({
+    filme: n.valor,
+    nivel: n.nivel,
+    indice: n.indice,
+    papel: n.papel,
+  }));
+
+  return (
+    <div className="rotacoes">
+      <h4>Rotações passo a passo</h4>
+      <ControlesPasso anim={anim} />
+      <p className="legenda-rotacao">
+        <b>
+          Passo {numeroPasso} de {quadros.length / 2} · {quadro.passo}
+        </b>{" "}
+        {quadro.momento === "antes" ? "· antes da rotação" : "· depois da rotação"}
+        <span>{EXPLICA_PASSO[quadro.passo]}</span>
+        <span>
+          O nó buscado está na profundidade <strong>{quadro.profundidade}</strong>
+          {quadro.profundidade === 0 ? ": chegou à raiz." : "."}
+        </span>
+      </p>
+      <DesenhoArvore nos={nos} niveis={4} passo={96} movel />
+      <p className="dica">
+        O desenho mostra só o pedaço da árvore em volta do nó que está subindo, com o pai e o avô
+        marcados. A animação repete o que a árvore já fez; ela não mexe na árvore de novo.
+      </p>
+    </div>
+  );
 }
 
 function AbaArvore({ acervo, aoAfunilar }: Props) {
@@ -481,8 +529,17 @@ function AbaArvore({ acervo, aoAfunilar }: Props) {
 
   function afunilar(filme: Filme) {
     const antes = fotografar(arvore, NIVEIS_ARVORE);
+    // liga a gravação dos quadros só durante este afunilamento
+    arvore.gravarQuadros = true;
     const operacao = aoAfunilar(filme);
-    setUltimo({ filme, operacao, antes, depois: fotografar(arvore, NIVEIS_ARVORE) });
+    arvore.gravarQuadros = false;
+    setUltimo({
+      filme,
+      operacao,
+      antes,
+      depois: fotografar(arvore, NIVEIS_ARVORE),
+      quadros: arvore.quadros,
+    });
   }
 
   return (
@@ -582,6 +639,7 @@ function AbaArvore({ acervo, aoAfunilar }: Props) {
                 Contorno dourado: a raiz anterior, que desceu. Clique em qualquer nó de “Depois”
                 para afunilá-lo.
               </p>
+              <RotacoesPassoAPasso ultimo={ultimo} />
             </>
           ) : (
             <>

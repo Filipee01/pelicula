@@ -127,7 +127,31 @@ describe("ArvoreSplay", () => {
     expect(a.ultimaOperacao.passos).toEqual([]);
   });
 
-  it("consulta por prefixo não mexe na árvore", () => {
+  it("grava os quadros das rotações sem mudar o afunilamento", () => {
+    const com = new ArvoreSplay<number, string>((x, y) => x - y);
+    const sem = new ArvoreSplay<number, string>((x, y) => x - y);
+    for (const k of embaralhar(300)) {
+      com.inserir(k, `v${k}`);
+      sem.inserir(k, `v${k}`);
+    }
+    com.gravarQuadros = true;
+    com.buscar(7);
+    com.gravarQuadros = false;
+    sem.buscar(7);
+    const op = com.ultimaOperacao;
+    expect(op.passos).toEqual(sem.ultimaOperacao.passos);
+    expect(emOrdem(com)).toEqual(emOrdem(sem));
+    expect(com.quadros.length).toBe(op.passos.length * 2);
+    expect(com.quadros[0].profundidade).toBe(op.profundidade);
+    const ultimo = com.quadros[com.quadros.length - 1];
+    expect(ultimo.profundidade).toBe(0);
+    expect(ultimo.nos[0]).toMatchObject({ valor: "v7", nivel: 0, papel: "no" });
+    // sem gravar, nada é guardado
+    sem.buscar(150);
+    expect(sem.quadros).toEqual([]);
+  });
+
+    it("consulta por prefixo não mexe na árvore", () => {
     const a = new ArvoreSplay<string, number>((x, y) => (x < y ? -1 : x > y ? 1 : 0));
     ["monet", "manet", "munch", "matisse", "mondrian", "picasso", "goya"].forEach((n, i) =>
       a.inserir(n, i),
