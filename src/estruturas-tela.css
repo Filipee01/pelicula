@@ -638,3 +638,18 @@
   background: #fff !important;
   box-shadow: 0 0 0 2px var(--destaque), 0 0 14px rgba(255, 255, 255, 0.7);
 }
+
+/* busca sequencial animada na lista de gêneros */
+.encadeada button.visto {
+  opacity: 0.45;
+}
+.encadeada button.comparando {
+  border-color: #fff;
+  box-shadow: 0 0 0 2px #fff, 0 0 18px rgba(255, 255, 255, 0.45);
+}
+.encadeada button.achado {
+  border-color: var(--ouro);
+  background: var(--ouro);
+  color: #1b1508;
+  box-shadow: 0 0 18px rgba(255, 200, 87, 0.55);
+}

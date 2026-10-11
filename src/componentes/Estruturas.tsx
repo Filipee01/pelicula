@@ -77,10 +77,43 @@ function NumeroFilme(props: { valor: string; rotulo: string; filme?: Filme | nul
 
 /* ---------- 1. lista encadeada com movimentação ao início ---------- */
 
+interface AcessoAnimado {
+  antes: Genero[]; // ordem da lista antes do acesso
+  posicao: number; // onde o gênero estava (começa em 0)
+  id: number;
+}
+
 function AbaLista({ acervo, genero, ultimoAcesso, aoEscolherGenero }: Props) {
   const ref = useRef<HTMLOListElement>(null);
+  const contador = useRef(0);
   const generos = acervo.generos.paraVetor();
-  useFlip(ref, generos.map((g) => g.id).join());
+  const [acesso, setAcesso] = useState<AcessoAnimado | null>(null);
+
+  // A lista já faz o acesso na hora; a animação repete a busca sequencial nó por nó:
+  // um passo por comparação e um último passo para mover o nó para o início.
+  const seq = usePassoAPasso(acesso ? acesso.posicao + 2 : 0, acesso?.id, {
+    intervalo: 380,
+    tocarAoMudar: true,
+  });
+  const animando = acesso !== null && !seq.terminou;
+  const comparados = acesso ? Math.min(seq.passo, acesso.posicao + 1) : 0;
+  const achou = acesso !== null && comparados === acesso.posicao + 1;
+  const exibidos = animando ? acesso.antes : generos;
+  useFlip(ref, exibidos.map((g) => g.id).join());
+
+  function acessar(g: Genero) {
+    const antes = acervo.generos.paraVetor();
+    setAcesso({ antes, posicao: antes.indexOf(g), id: ++contador.current });
+    aoEscolherGenero(g);
+  }
+
+  const textoSeq = !animando
+    ? undefined
+    : seq.passo === 0
+      ? "a busca começa pelo primeiro nó da lista"
+      : achou
+        ? `achou “${acesso.antes[acesso.posicao].nome}”: agora o nó vai para o início`
+        : `comparou com “${acesso.antes[comparados - 1].nome}”: não é, segue para o próximo nó`;
 
   return (
     <div className="aba">
@@ -101,17 +134,43 @@ function AbaLista({ acervo, genero, ultimoAcesso, aoEscolherGenero }: Props) {
 
       <div className="palco">
         <Demonstracao titulo="Clique em um gênero para acessá-lo">
+          {acesso && <ControlesPasso anim={seq} texto={textoSeq} />}
           <ol className="encadeada" ref={ref}>
-            {generos.map((g, i) => (
+            {exibidos.map((g, i) => (
               <li key={g.id} data-flip={g.id}>
-                <button className={g === genero ? "ativo" : ""} onClick={() => aoEscolherGenero(g)}>
+                <button
+                  className={
+                    animando
+                      ? i < comparados - 1
+                        ? "visto"
+                        : i === comparados - 1
+                          ? achou
+                            ? "achado"
+                            : "comparando"
+                          : ""
+                      : g === genero
+                        ? "ativo"
+                        : ""
+                  }
+                  onClick={() => acessar(g)}
+                >
                   <small>{i + 1}</small>
                   {g.nome}
                 </button>
               </li>
             ))}
           </ol>
-          {ultimoAcesso ? (
+          {animando ? (
+            <div className="numeros">
+              <Numero valor={achou ? `${acesso.posicao + 1}ª` : "…"} rotulo="posição em que estava" />
+              <Numero
+                valor={String(comparados)}
+                rotulo={comparados === 1 ? "comparação" : "comparações na busca sequencial"}
+                destaque
+              />
+              <Numero valor="…" rotulo="posição depois do acesso" />
+            </div>
+          ) : ultimoAcesso ? (
             <div className="numeros">
               <Numero valor={`${ultimoAcesso.posicaoAnterior + 1}ª`} rotulo="posição em que estava" />
               <Numero
