@@ -20,6 +20,8 @@ export default function App() {
   const [tela, setTela] = useState<"catalogo" | "estruturas">("catalogo");
   // A lateral com o topo da árvore começa recolhida, para o catálogo abrir limpo.
   const [lateralAberta, setLateralAberta] = useState(false);
+  // a lateral abre sozinha no primeiro filme aberto, se ninguém mexeu nela antes
+  const lateralJaUsada = useRef(false);
   const [ultimoAcesso, setUltimoAcesso] = useState<AcessoLista<Genero> | null>(null);
   const listaGenerosRef = useRef<HTMLUListElement>(null);
 
@@ -101,6 +103,10 @@ export default function App() {
   function abrirFilme(filme: Filme) {
     afunilar(filme);
     setFilmeAberto(filme);
+    if (!lateralJaUsada.current) {
+      lateralJaUsada.current = true;
+      setLateralAberta(true);
+    }
   }
 
   return (
@@ -165,7 +171,10 @@ export default function App() {
             acervo={acervo}
             aberta={lateralAberta}
             aoAbrirFilme={abrirFilme}
-            aoAlternar={() => setLateralAberta((v) => !v)}
+            aoAlternar={() => {
+              lateralJaUsada.current = true;
+              setLateralAberta((v) => !v);
+            }}
           />
         </>
       )}
