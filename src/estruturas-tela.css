@@ -364,7 +364,7 @@
 }
 .barra {
   display: grid;
-  grid-template-columns: 64px minmax(0, 1fr) 70px 150px;
+  grid-template-columns: 64px minmax(0, 1fr) 70px 140px 150px;
   align-items: center;
   gap: 12px;
   font-variant-numeric: tabular-nums;
@@ -557,4 +557,55 @@
   .cenarios {
     grid-template-columns: 1fr;
   }
+}
+
+/* pôsteres dentro da aba da lista com saltos */
+
+.caminho .mini {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  margin-top: 4px;
+  border-radius: 3px;
+  object-fit: cover;
+  background: var(--superficie-2);
+}
+.caminho span.mini {
+  background: none;
+}
+.caminho .alvo-classica .mini {
+  outline: 2px solid #e8ebf7;
+}
+.caminho .alvo-truncada .mini {
+  outline: 2px solid var(--ouro);
+}
+.numero.com-filme {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.numero.com-filme img {
+  width: 46px;
+  height: 69px;
+  flex: none;
+  border-radius: 6px;
+  object-fit: cover;
+  background: var(--superficie-2);
+}
+.numero.com-filme > div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.amostra-nivel {
+  display: flex;
+  gap: 3px;
+  justify-content: flex-end;
+}
+.amostra-nivel img {
+  width: 22px;
+  height: 33px;
+  border-radius: 3px;
+  object-fit: cover;
+  background: var(--superficie-2);
 }

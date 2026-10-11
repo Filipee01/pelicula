@@ -1,6 +1,6 @@
 import { ReactNode, useMemo, useRef, useState } from "react";
 import { numero } from "../App";
-import { Acervo, Filme, Genero, aPartirDoAno, normalizar } from "../dados";
+import { Acervo, Filme, Genero, aPartirDoAno, normalizar, urlPoster } from "../dados";
 import { OperacaoSplay } from "../estruturas/ArvoreSplay";
 import { AcessoLista } from "../estruturas/ListaMTF";
 import { NoSkip, Salto } from "../estruturas/SkipList";
@@ -57,6 +57,19 @@ function Numero(props: { valor: string; rotulo: string; destaque?: boolean }) {
     <div className={`numero ${props.destaque ? "forte" : ""}`}>
       <strong>{props.valor}</strong>
       <span>{props.rotulo}</span>
+    </div>
+  );
+}
+
+// número grande com o pôster do filme ao lado
+function NumeroFilme(props: { valor: string; rotulo: string; filme?: Filme | null; destaque?: boolean }) {
+  return (
+    <div className={`numero com-filme ${props.destaque ? "forte" : ""}`}>
+      {props.filme && <img src={urlPoster(props.filme, 92)} alt="" />}
+      <div>
+        <strong>{props.valor}</strong>
+        <span>{props.rotulo}</span>
+      </div>
     </div>
   );
 }
@@ -154,6 +167,17 @@ function AbaSaltos({ genero }: Props) {
     return { colunas, caminho };
   }, [lista, classica, truncada]);
 
+  // alguns filmes de cada nível, espalhados pela ordem, para mostrar a amostra que o nível é
+  const amostras = useMemo(
+    () =>
+      Array.from({ length: lista.niveis }, (_, n) => {
+        const nos = lista.percorrer(n, lista.primeiro(n), lista.nosPorNivel[n]).nos;
+        const quantos = Math.min(5, nos.length);
+        return Array.from({ length: quantos }, (_, i) => nos[Math.floor((i * nos.length) / quantos)].valor);
+      }),
+    [lista],
+  );
+
   const niveis = Array.from({ length: lista.niveis }, (_, i) => lista.niveis - 1 - i);
   const saltos: Salto[] = [];
   const noK = lista.porPosicao(k - 1, saltos);
@@ -240,6 +264,11 @@ function AbaSaltos({ genero }: Props) {
                     return <i key={n} className={`cheia ${classe}`} />;
                   })}
                   <small>{ehCabeca ? "início" : no.valor.ano}</small>
+                  {ehCabeca ? (
+                    <span className="mini" />
+                  ) : (
+                    <img className="mini" src={urlPoster(no.valor, 92)} alt="" />
+                  )}
                 </div>
               );
             })}
@@ -257,13 +286,15 @@ function AbaSaltos({ genero }: Props) {
 
           <div className="numeros">
             <Numero valor={numero(classica.posicao)} rotulo="comparações em uma busca sequencial" />
-            <Numero
+            <NumeroFilme
               valor={String(classica.comparacoes)}
-              rotulo={`clássica: chega em “${classica.no?.valor.titulo ?? "fim da lista"}”`}
+              rotulo={`clássica: chega em “${classica.no?.valor.titulo ?? "fim da lista"}”${classica.no ? ` (${classica.no.valor.ano})` : ""}`}
+              filme={classica.no?.valor}
             />
-            <Numero
+            <NumeroFilme
               valor={String(truncada.comparacoes)}
               rotulo={`truncada no nível ${nivelMinimo}: chega em “${truncada.no?.valor.titulo ?? "fim do nível"}”${truncada.no ? ` (${truncada.no.valor.ano})` : ""}`}
+              filme={truncada.no?.valor}
               destaque
             />
           </div>
@@ -296,7 +327,7 @@ function AbaSaltos({ genero }: Props) {
           <div className="numeros">
             <Numero valor={numero(k)} rotulo="passos andando pelo nível 0" />
             <Numero valor={String(saltos.length)} rotulo="saltos somando as larguras" destaque />
-            <Numero valor={String(noK?.valor.ano ?? "")} rotulo={`“${noK?.valor.titulo ?? ""}”`} />
+            <NumeroFilme valor={String(noK?.valor.ano ?? "")} rotulo={`“${noK?.valor.titulo ?? ""}”`} filme={noK?.valor} />
           </div>
         </Demonstracao>
 
@@ -308,6 +339,11 @@ function AbaSaltos({ genero }: Props) {
                 <i style={{ width: `${Math.max(0.4, (quantidade / lista.tamanho) * 100)}%` }} />
                 <b>{numero(quantidade)}</b>
                 <small>esperado ≈ {numero(Math.round(lista.tamanho / 2 ** n))}</small>
+                <span className="amostra-nivel">
+                  {amostras[n].map((f) => (
+                    <img key={f.id} src={urlPoster(f, 92)} alt="" title={`${f.titulo} (${f.ano})`} />
+                  ))}
+                </span>
               </div>
             ))}
           </div>
