@@ -609,3 +609,32 @@
   object-fit: cover;
   background: var(--superficie-2);
 }
+
+/* animações passo a passo */
+
+.controles-passo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+}
+.controles-passo .botao {
+  padding: 7px 14px;
+}
+.controles-passo .contador {
+  margin-left: 4px;
+  color: var(--suave);
+  font-variant-numeric: tabular-nums;
+}
+.controles-passo .explica {
+  flex-basis: 100%;
+  color: var(--ouro);
+  font-size: 14px;
+}
+.caminho .coluna i {
+  transition: background 0.25s;
+}
+.caminho i.marcador {
+  background: #fff !important;
+  box-shadow: 0 0 0 2px var(--destaque), 0 0 14px rgba(255, 255, 255, 0.7);
+}

@@ -7,6 +7,7 @@ import { NoSkip, Salto } from "../estruturas/SkipList";
 import { useFlip } from "../useFlip";
 import { ComparacaoArvores } from "./ComparacaoArvores";
 import { DesenhoArvore, NoDesenho, fotografar } from "./DesenhoArvore";
+import { ControlesPasso, usePassoAPasso } from "./PassoAPasso";
 
 type Aba = "lista" | "saltos" | "arvore";
 
@@ -149,23 +150,38 @@ function AbaSaltos({ genero }: Props) {
   );
 
   // Colunas do desenho: a cabeça, cada nó em que a busca pisou e os dois resultados.
-  const { colunas, caminho } = useMemo(() => {
+  // A trilha é o caminho da busca clássica, casa por casa (coluna, nível), na ordem em
+  // que a busca passa: descendo um nível ou avançando para o próximo nó.
+  const { colunas, trilha } = useMemo(() => {
     const colunas: NoSkip<Filme>[] = [lista.cabeca];
-    const caminho = new Set<string>();
-    let nivelAnterior = lista.niveis - 1;
+    let nivelAtual = lista.niveis - 1;
+    const trilha = [{ c: 0, n: nivelAtual }];
     for (const { nivel, no } of classica.visitas) {
-      // Ao descer, a busca continua no mesmo nó: marca os níveis intermediários.
-      for (let n = nivelAnterior; n >= nivel; n--) caminho.add(`${colunas.length - 1}:${n}`);
+      while (nivelAtual > nivel) trilha.push({ c: colunas.length - 1, n: --nivelAtual });
       colunas.push(no);
-      caminho.add(`${colunas.length - 1}:${nivel}`);
-      nivelAnterior = nivel;
+      trilha.push({ c: colunas.length - 1, n: nivel });
     }
-    for (let n = nivelAnterior; n >= 0; n--) caminho.add(`${colunas.length - 1}:${n}`);
+    while (nivelAtual > 0) trilha.push({ c: colunas.length - 1, n: --nivelAtual });
     for (const alvo of [classica.no, truncada.no]) {
       if (alvo && !colunas.includes(alvo)) colunas.push(alvo);
     }
-    return { colunas, caminho };
+    return { colunas, trilha };
   }, [lista, classica, truncada]);
+
+  // animação do caminho: a cada passo a busca anda uma casa
+  const busca = usePassoAPasso(trilha.length, `${ano}:${nivelMinimo}`, { intervalo: 420 });
+  const ordem = new Map(trilha.map((t, i) => [`${t.c}:${t.n}`, i]));
+  // a truncada termina quando a trilha desce abaixo do nível mínimo
+  const parada = trilha.findIndex((t) => t.n < nivelMinimo);
+  const fimTruncada = parada === -1 ? trilha.length : parada;
+  const truncadaPronta = busca.passo >= fimTruncada;
+  const textoBusca = busca.terminou
+    ? undefined
+    : busca.passo === 0
+      ? "a busca começa no topo da cabeça da lista"
+      : truncadaPronta
+        ? `a truncada já parou no nível ${nivelMinimo}; só a clássica continua descendo`
+        : "descendo pelos níveis de cima: este trecho as duas buscas fazem";
 
   // alguns filmes de cada nível, espalhados pela ordem, para mostrar a amostra que o nível é
   const amostras = useMemo(
@@ -238,6 +254,8 @@ function AbaSaltos({ genero }: Props) {
             </label>
           </div>
 
+          <ControlesPasso anim={busca} texto={textoBusca} />
+
           <div className="caminho">
             <div className="coluna rotulos">
               {niveis.map((n) => (
@@ -250,7 +268,11 @@ function AbaSaltos({ genero }: Props) {
             {colunas.map((no, c) => {
               const ehCabeca = c === 0;
               const papel =
-                no === truncada.no ? "alvo-truncada" : no === classica.no ? "alvo-classica" : "";
+                no === truncada.no && truncadaPronta
+                  ? "alvo-truncada"
+                  : no === classica.no && busca.terminou
+                    ? "alvo-classica"
+                    : "";
               return (
                 <div
                   key={c}
@@ -259,9 +281,11 @@ function AbaSaltos({ genero }: Props) {
                 >
                   {niveis.map((n) => {
                     if (no.altura <= n) return <i key={n} />;
-                    const pisou = caminho.has(`${c}:${n}`);
+                    const indice = ordem.get(`${c}:${n}`);
+                    const pisou = indice !== undefined && indice < busca.passo;
                     const classe = !pisou ? "" : n >= nivelMinimo ? "comum" : "so-classica";
-                    return <i key={n} className={`cheia ${classe}`} />;
+                    const aqui = !busca.terminou && indice === busca.passo - 1;
+                    return <i key={n} className={`cheia ${classe} ${aqui ? "marcador" : ""}`} />;
                   })}
                   <small>{ehCabeca ? "início" : no.valor.ano}</small>
                   {ehCabeca ? (
