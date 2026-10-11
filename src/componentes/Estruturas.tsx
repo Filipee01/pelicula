@@ -256,6 +256,9 @@ function AbaSaltos({ genero }: Props) {
   const niveis = Array.from({ length: lista.niveis }, (_, i) => lista.niveis - 1 - i);
   const saltos: Salto[] = [];
   const noK = lista.porPosicao(k - 1, saltos);
+  // animação dos saltos: aparecem um por um, com a soma das larguras crescendo
+  const pulos = usePassoAPasso(saltos.length, k, { intervalo: 700 });
+  const somaAteAgora = saltos.slice(0, pulos.passo).reduce((total, s) => total + s.largura, 0);
 
   return (
     <div className="aba">
@@ -398,19 +401,31 @@ function AbaSaltos({ genero }: Props) {
               />
             </label>
           </div>
+          <ControlesPasso
+            anim={pulos}
+            texto={
+              pulos.terminou
+                ? undefined
+                : `já pulou ${numero(somaAteAgora)} filmes; faltam ${numero(k - somaAteAgora)} para chegar ao filme ${numero(k)}`
+            }
+          />
           <p className="soma">
-            {saltos.map((s, i) => (
+            {saltos.slice(0, pulos.passo).map((s, i) => (
               <span key={i} title={`salto no nível ${s.nivel}`}>
                 {numero(s.largura)}
                 <small>nível {s.nivel}</small>
               </span>
             ))}
-            <b>= {numero(k)}</b>
+            <b>= {numero(somaAteAgora)}</b>
           </p>
           <div className="numeros">
             <Numero valor={numero(k)} rotulo="passos andando pelo nível 0" />
-            <Numero valor={String(saltos.length)} rotulo="saltos somando as larguras" destaque />
-            <NumeroFilme valor={String(noK?.valor.ano ?? "")} rotulo={`“${noK?.valor.titulo ?? ""}”`} filme={noK?.valor} />
+            <Numero valor={String(pulos.passo)} rotulo="saltos somando as larguras" destaque />
+            {pulos.terminou ? (
+              <NumeroFilme valor={String(noK?.valor.ano ?? "")} rotulo={`“${noK?.valor.titulo ?? ""}”`} filme={noK?.valor} />
+            ) : (
+              <Numero valor="…" rotulo="o filme aparece no último salto" />
+            )}
           </div>
         </Demonstracao>
 

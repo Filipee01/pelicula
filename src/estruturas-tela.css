@@ -653,3 +653,14 @@
   color: #1b1508;
   box-shadow: 0 0 18px rgba(255, 200, 87, 0.55);
 }
+
+/* cada salto entra deslizando */
+.soma span {
+  animation: entrar-salto 0.35s ease;
+}
+@keyframes entrar-salto {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.9);
+  }
+}
