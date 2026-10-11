@@ -141,7 +141,13 @@ describe("ArvoreSplay", () => {
     const op = com.ultimaOperacao;
     expect(op.passos).toEqual(sem.ultimaOperacao.passos);
     expect(emOrdem(com)).toEqual(emOrdem(sem));
-    expect(com.quadros.length).toBe(op.passos.length * 2);
+    expect(com.quadros.length).toBe(op.passos.reduce((n, p) => n + (p === "zig" ? 2 : 3), 0));
+    // a profundidade cai um nível a cada rotação
+    for (let i = 1; i < com.quadros.length; i++) {
+      const q = com.quadros[i];
+      const anterior = com.quadros[i - 1];
+      expect(q.profundidade).toBe(q.momento === "antes" ? anterior.profundidade : anterior.profundidade - 1);
+    }
     expect(com.quadros[0].profundidade).toBe(op.profundidade);
     const ultimo = com.quadros[com.quadros.length - 1];
     expect(ultimo.profundidade).toBe(0);

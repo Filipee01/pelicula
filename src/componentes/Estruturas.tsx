@@ -5,6 +5,7 @@ import { OperacaoSplay, PassoSplay, QuadroSplay } from "../estruturas/ArvoreSpla
 import { AcessoLista } from "../estruturas/ListaMTF";
 import { NoSkip, Salto } from "../estruturas/SkipList";
 import { useFlip } from "../useFlip";
+import { ArvoreAnimada } from "./ArvoreAnimada";
 import { ComparacaoArvores } from "./ComparacaoArvores";
 import { DesenhoArvore, NoDesenho, fotografar } from "./DesenhoArvore";
 import { ControlesPasso, usePassoAPasso } from "./PassoAPasso";
@@ -474,12 +475,12 @@ const EXPLICA_PASSO: Record<PassoSplay, string> = {
 // do nó antes e depois dela. Os pôsteres deslizam para as posições novas.
 function RotacoesPassoAPasso({ ultimo }: { ultimo: Afunilamento }) {
   const { quadros } = ultimo;
-  // passo 0 mostra o primeiro quadro; cada clique avança um quadro (antes, depois, antes...)
-  const anim = usePassoAPasso(Math.max(0, quadros.length - 1), ultimo, { intervalo: 1300 });
+  // passo 0 mostra o primeiro quadro; cada clique avança uma rotação
+  const anim = usePassoAPasso(Math.max(0, quadros.length - 1), ultimo, { intervalo: 1100 });
   if (quadros.length === 0) return null;
-  const i = Math.min(anim.passo, quadros.length - 1);
-  const quadro = quadros[i];
-  const numeroPasso = Math.floor(i / 2) + 1;
+  const quadro = quadros[Math.min(anim.passo, quadros.length - 1)];
+  const totalPassos = ultimo.operacao.passos.length;
+  const fundo = quadros[0].profundidade; // de onde o nó começou a subir
   const nos: NoDesenho[] = quadro.nos.map((n) => ({
     filme: n.valor,
     nivel: n.nivel,
@@ -493,19 +494,39 @@ function RotacoesPassoAPasso({ ultimo }: { ultimo: Afunilamento }) {
       <ControlesPasso anim={anim} />
       <p className="legenda-rotacao">
         <b>
-          Passo {numeroPasso} de {quadros.length / 2} · {quadro.passo}
-        </b>{" "}
-        {quadro.momento === "antes" ? "· antes da rotação" : "· depois da rotação"}
+          Passo {quadro.numeroPasso} de {totalPassos} · {quadro.passo}
+        </b>
+        <span className="acao">{quadro.momento === "antes" ? "antes das rotações deste passo" : quadro.acao}</span>
         <span>{EXPLICA_PASSO[quadro.passo]}</span>
-        <span>
-          O nó buscado está na profundidade <strong>{quadro.profundidade}</strong>
-          {quadro.profundidade === 0 ? ": chegou à raiz." : "."}
-        </span>
       </p>
-      <DesenhoArvore nos={nos} niveis={4} passo={96} movel />
+      <div className="rotacoes-palco">
+        <div className="regua" title="profundidade do nó que está subindo">
+          <span>raiz</span>
+          <div className="trilho">
+            {Array.from({ length: fundo + 1 }, (_, d) => (
+              <i
+                key={d}
+                className={d === quadro.profundidade ? "atual" : d > quadro.profundidade ? "subiu" : ""}
+                style={{ top: `${(d / Math.max(1, fundo)) * 100}%` }}
+              />
+            ))}
+            <b style={{ top: `${(quadro.profundidade / Math.max(1, fundo)) * 100}%` }}>
+              {quadro.profundidade}
+            </b>
+          </div>
+          <span>{fundo}</span>
+        </div>
+        <ArvoreAnimada nos={nos} niveis={4} passo={96} girou={quadro.girou} />
+      </div>
+      <p className="legenda-caminho">
+        <span className="amostra linha-no" /> ligação do nó
+        <span className="amostra linha-pai" /> pai com o avô
+        <span className="amostra linha-girou" /> ligação que acabou de girar
+      </p>
       <p className="dica">
-        O desenho mostra só o pedaço da árvore em volta do nó que está subindo, com o pai e o avô
-        marcados. A animação repete o que a árvore já fez; ela não mexe na árvore de novo.
+        À esquerda, a régua mostra a profundidade do nó: ele começa lá embaixo e sobe a cada
+        rotação até a raiz. O desenho mostra só o pedaço da árvore em volta dele. A animação
+        repete o que a árvore já fez; ela não mexe na árvore de novo.
       </p>
     </div>
   );

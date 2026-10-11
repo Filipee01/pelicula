@@ -38,9 +38,16 @@ export interface OperacaoSplay {
 // depois de um passo do afunilamento. Serve só para a tela; não muda o algoritmo.
 export interface QuadroSplay<V> {
   passo: PassoSplay;
-  momento: "antes" | "depois";
+  // 1 para o primeiro passo do afunilamento, 2 para o segundo...
+  numeroPasso: number;
+  // "antes" do passo, "meio" (entre as duas rotações de um zig-zig ou zig-zag) e "depois"
+  momento: "antes" | "meio" | "depois";
+  // a rotação que acabou de acontecer, em palavras (vazio no "antes")
+  acao: string;
   // profundidade do nó que está subindo, neste quadro
   profundidade: number;
+  // a ligação que acabou de girar: [o que subiu, o que desceu]
+  girou: [V, V] | null;
   nos: { valor: V; nivel: number; indice: number; papel?: "no" | "pai" | "avo" }[];
 }
 
@@ -87,30 +94,43 @@ export class ArvoreSplay<K, V> {
   // Devolve a lista dos passos só para a tela mostrar.
   private afunilar(x: NoSplay<K, V>): PassoSplay[] {
     const passos: PassoSplay[] = [];
-    if (this.gravarQuadros) this.quadros = [];
-    let profundidade = this.gravarQuadros ? this.profundidadeDe(x) : 0;
+    const gravar = this.gravarQuadros;
+    if (gravar) this.quadros = [];
+    let profundidade = gravar ? this.profundidadeDe(x) : 0;
     while (x.pai) {
       const p = x.pai;
       const avo = p.pai;
       const passo: PassoSplay = !avo ? "zig" : (avo.esq === p) === (p.esq === x) ? "zig-zig" : "zig-zag";
-      if (this.gravarQuadros) this.gravarQuadro(passo, "antes", profundidade, avo ?? p, x, p, avo);
+      const numero = passos.length + 1;
+      // os quadros abaixo são só para a animação da tela
+      const quadro = (momento: QuadroSplay<V>["momento"], acao: string, girou: [NoSplay<K, V>, NoSplay<K, V>] | null) => {
+        if (gravar) this.gravarQuadro(passo, numero, momento, acao, profundidade, girou, x, p, avo);
+      };
+      quadro("antes", "", null);
 
       if (passo === "zig") {
         // o pai é a raiz
         this.rotacionar(x);
+        profundidade--;
+        quadro("depois", "girou o nó sobre o pai", [x, p]);
       } else if (passo === "zig-zig") {
         // x e o pai estão do mesmo lado
         this.rotacionar(p);
+        profundidade--;
+        quadro("meio", "1ª rotação: girou o pai sobre o avô", [p, avo!]);
         this.rotacionar(x);
+        profundidade--;
+        quadro("depois", "2ª rotação: girou o nó sobre o pai", [x, p]);
       } else {
         // x e o pai estão em lados opostos
         this.rotacionar(x);
+        profundidade--;
+        quadro("meio", "1ª rotação: girou o nó sobre o pai", [x, p]);
         this.rotacionar(x);
+        profundidade--;
+        quadro("depois", "2ª rotação: girou o nó sobre o avô", [x, avo!]);
       }
       passos.push(passo);
-
-      profundidade -= passo === "zig" ? 1 : 2;
-      if (this.gravarQuadros) this.gravarQuadro(passo, "depois", profundidade, x, x, p, avo);
     }
     return passos;
   }
@@ -121,17 +141,22 @@ export class ArvoreSplay<K, V> {
     return d;
   }
 
-  // fotografa 4 níveis a partir de "topo", marcando o nó que sobe, o pai e o avô
+  // fotografa 4 níveis a partir do mais alto entre o nó, o pai e o avô,
+  // marcando os três
   private gravarQuadro(
     passo: PassoSplay,
-    momento: "antes" | "depois",
+    numeroPasso: number,
+    momento: QuadroSplay<V>["momento"],
+    acao: string,
     profundidade: number,
-    topo: NoSplay<K, V>,
+    girou: [NoSplay<K, V>, NoSplay<K, V>] | null,
     x: NoSplay<K, V>,
     p: NoSplay<K, V>,
     avo: NoSplay<K, V> | null,
   ): void {
     const papel = (n: NoSplay<K, V>) => (n === x ? "no" : n === p ? "pai" : n === avo ? "avo" : undefined);
+    let topo = x;
+    while (topo.pai && (topo.pai === p || topo.pai === avo)) topo = topo.pai;
     const nos: QuadroSplay<V>["nos"] = [];
     let fila = [{ no: topo, nivel: 0, indice: 0 }];
     while (fila.length) {
@@ -144,7 +169,15 @@ export class ArvoreSplay<K, V> {
       }
       fila = proxima;
     }
-    this.quadros.push({ passo, momento, profundidade, nos });
+    this.quadros.push({
+      passo,
+      numeroPasso,
+      momento,
+      acao,
+      profundidade,
+      girou: girou ? [girou[0].valor, girou[1].valor] : null,
+      nos,
+    });
   }
 
   // desce pela árvore procurando a chave; devolve o nó dela ou o último visitado
