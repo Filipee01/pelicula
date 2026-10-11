@@ -803,3 +803,14 @@
 .arvore .papel-no img {
   box-shadow: 0 0 0 2.5px var(--ouro), 0 0 16px rgba(255, 200, 87, 0.5);
 }
+
+.acoes-comparacao {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.acoes-comparacao .sorteio {
+  color: var(--suave);
+  font-size: 13.5px;
+}

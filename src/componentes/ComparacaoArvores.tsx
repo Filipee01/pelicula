@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { numero } from "../App";
-import { Comparacao, compararArvores } from "../comparacao";
+import { Comparacao, SEMENTE_PADRAO, compararArvores } from "../comparacao";
 import { Filme } from "../dados";
 import { ArvoreSplay } from "../estruturas/ArvoreSplay";
 
@@ -21,14 +21,17 @@ export function ComparacaoArvores({ arvore }: { arvore: ArvoreSplay<string, Film
   const [resultado, setResultado] = useState<Comparacao | null>(null);
   const [rodando, setRodando] = useState(false);
 
-  function rodar() {
+  // semente padrão: sempre o mesmo resultado; outra semente: outro sorteio de buscas
+  function rodar(semente: number) {
     setRodando(true);
     // O intervalo deixa o aviso "montando" aparecer antes do cálculo, que trava a tela.
     setTimeout(() => {
-      setResultado(compararArvores(arvore));
+      setResultado(compararArvores(arvore, semente));
       setRodando(false);
     }, 40);
   }
+
+  const outroSorteio = () => rodar(1 + Math.floor(Math.random() * 1_000_000));
 
   // No cenário do filme repetido, vence quem somar menos comparações.
   const somar = (serie: number[] = []) => serie.reduce((total, n) => total + n, 0);
@@ -42,10 +45,20 @@ export function ComparacaoArvores({ arvore }: { arvore: ArvoreSplay<string, Film
         recebem as mesmas chaves e respondem às mesmas buscas, e contamos as comparações de cada
         uma. O teste roda em cópias, sem mexer na árvore do catálogo.
       </p>
-      <div>
-        <button className="botao primario" onClick={rodar} disabled={rodando}>
-          {rodando ? "Montando as duas árvores…" : resultado ? "Rodar de novo" : "Rodar comparação"}
+      <div className="acoes-comparacao">
+        <button className="botao primario" onClick={() => rodar(SEMENTE_PADRAO)} disabled={rodando}>
+          {rodando ? "Montando as duas árvores…" : "Rodar comparação"}
         </button>
+        <button className="botao" onClick={outroSorteio} disabled={rodando}>
+          Rodar com outro sorteio
+        </button>
+        {resultado && (
+          <span className="sorteio">
+            {resultado.semente === SEMENTE_PADRAO
+              ? "sorteio padrão (sempre o mesmo resultado)"
+              : `sorteio nº ${numero(resultado.semente)}`}
+          </span>
+        )}
       </div>
 
       {resultado && (

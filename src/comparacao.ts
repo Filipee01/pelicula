@@ -25,13 +25,15 @@ export interface Comparacao {
   /** O mesmo filme buscado várias vezes seguidas: comparações de cada busca. */
   repetido: { filme: Filme; avl: number[]; afunilada: number[] };
   tempoMs: number;
+  // semente usada no sorteio (a padrão é sempre a mesma, para o resultado ser reproduzível)
+  semente: number;
 }
 
 const BUSCAS = 2000;
 const FAVORITOS = 20;
 const REPETICOES = 5;
 
-/** Gerador determinístico, para a comparação dar o mesmo resultado sempre. */
+/** Gerador determinístico: a mesma semente dá sempre o mesmo sorteio. */
 function criarSorteio(semente: number): () => number {
   let estado = semente >>> 0;
   return () => {
@@ -40,9 +42,14 @@ function criarSorteio(semente: number): () => number {
   };
 }
 
-export function compararArvores(original: ArvoreSplay<string, Filme>): Comparacao {
+export const SEMENTE_PADRAO = 2026;
+
+export function compararArvores(
+  original: ArvoreSplay<string, Filme>,
+  semente = SEMENTE_PADRAO,
+): Comparacao {
   const inicio = performance.now();
-  const sorteio = criarSorteio(2026);
+  const sorteio = criarSorteio(semente);
 
   // Todas as chaves, lidas em ordem sem afunilar a árvore do catálogo.
   const nos = original.aPartirDe("", () => true, Infinity);
@@ -107,5 +114,6 @@ export function compararArvores(original: ArvoreSplay<string, Filme>): Comparaca
     cenarios,
     repetido,
     tempoMs: performance.now() - inicio,
+    semente,
   };
 }
