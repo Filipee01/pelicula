@@ -474,9 +474,10 @@ const EXPLICA_PASSO: Record<PassoSplay, string> = {
 // do nó antes e depois dela. Os pôsteres deslizam para as posições novas.
 function RotacoesPassoAPasso({ ultimo }: { ultimo: Afunilamento }) {
   const { quadros } = ultimo;
-  const anim = usePassoAPasso(quadros.length, ultimo, { intervalo: 1300 });
+  // passo 0 mostra o primeiro quadro; cada clique avança um quadro (antes, depois, antes...)
+  const anim = usePassoAPasso(Math.max(0, quadros.length - 1), ultimo, { intervalo: 1300 });
   if (quadros.length === 0) return null;
-  const i = Math.max(0, anim.passo - 1);
+  const i = Math.min(anim.passo, quadros.length - 1);
   const quadro = quadros[i];
   const numeroPasso = Math.floor(i / 2) + 1;
   const nos: NoDesenho[] = quadro.nos.map((n) => ({
