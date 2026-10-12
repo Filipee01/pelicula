@@ -573,23 +573,27 @@ function AbaArvore({ acervo, aoAfunilar }: Props) {
           topo.
         </p>
         <Modificacao
-          titulo="1 · Consulta por prefixo sem afunilar"
+          titulo="4 · Consulta por prefixo sem afunilar"
           classico="toda busca afunila o nó encontrado."
           nosso="o autocompletar desce até a primeira chave ≥ prefixo e anda pelos sucessores em ordem, sem mexer na árvore. Só abrir um filme afunila."
           codigo="ArvoreSplay.ts · aPartirDe(inicio, continuar, limite)"
         />
         <Modificacao
-          titulo="2 · Várias chaves por filme"
+          titulo="5 · Várias chaves por filme"
           classico="uma chave por registro."
           nosso="cada filme entra com o título completo e com os finais do título (“the dark knight”, “dark knight”, “knight”), todos apontando para o mesmo filme."
           codigo="dados.ts · chavesDoFilme()"
         />
-        <Modificacao
-          titulo="3 · Topo da árvore como vitrine"
-          classico="a forma da árvore é um detalhe interno."
-          nosso="os primeiros níveis são lidos em largura e desenhados no catálogo; as rotações de cada acesso ficam registradas."
-          codigo="ArvoreSplay.ts · topo(niveis), ultimaOperacao"
-        />
+        {/* não é modificação do algoritmo: só o que a árvore devolve para a tela desenhar */}
+        <article className="modificacao sem">
+          <h3>Só para a tela</h3>
+          <p>
+            O afunilamento (zig, zig-zig, zig-zag) é o clássico. A árvore também devolve os
+            primeiros níveis, para desenhar o topo no catálogo, e guarda os passos de cada
+            afunilamento, para a animação. Isso não muda o algoritmo.
+          </p>
+          <code>ArvoreSplay.ts · topo(niveis), ultimaOperacao</code>
+        </article>
       </aside>
 
       <div className="palco">
