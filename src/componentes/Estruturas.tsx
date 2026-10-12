@@ -584,16 +584,6 @@ function AbaArvore({ acervo, aoAfunilar }: Props) {
           nosso="cada filme entra com o título completo e com os finais do título (“the dark knight”, “dark knight”, “knight”), todos apontando para o mesmo filme."
           codigo="dados.ts · chavesDoFilme()"
         />
-        {/* não é modificação do algoritmo: só o que a árvore devolve para a tela desenhar */}
-        <article className="modificacao sem">
-          <h3>Só para a tela</h3>
-          <p>
-            O afunilamento (zig, zig-zig, zig-zag) é o clássico. A árvore também devolve os
-            primeiros níveis, para desenhar o topo no catálogo, e guarda os passos de cada
-            afunilamento, para a animação. Isso não muda o algoritmo.
-          </p>
-          <code>ArvoreSplay.ts · topo(niveis), ultimaOperacao</code>
-        </article>
       </aside>
 
       <div className="palco">
