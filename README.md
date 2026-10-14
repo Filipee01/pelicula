@@ -37,9 +37,10 @@ o trecho do código) e tem demonstrações que rodam sobre as estruturas reais d
 
 - **Lista encadeada com movimentação ao início.** Os nós encadeados dos gêneros; clicar em um mostra a posição em que estava, as
   comparações e a ida para o início.
-- **Lista com saltos.** O caminho da busca desenhado nível a nível, comparando a busca clássica,
-  a truncada e a sequencial; o acesso ao k-ésimo filme com a soma das larguras dos saltos; e a
-  quantidade de filmes em cada nível.
+- **Lista com saltos.** A lista inteira desenhada da cabeça ao fim, com uma linha por nível e
+  um risco por filme, e o caminho da busca por cima (clássica, truncada e sequencial); um zoom
+  nos nós em que a busca pisou; o acesso ao k-ésimo filme com a soma das larguras dos saltos; e
+  a quantidade de filmes em cada nível.
 - **Árvore afunilada.** A consulta por prefixo (com zero rotações), o afunilamento de um
   título, com os passos zig, zig-zig e zig-zag e o topo da árvore antes e depois, e a
   comparação com uma AVL nos mesmos acessos.

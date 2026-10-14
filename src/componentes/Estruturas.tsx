@@ -8,6 +8,7 @@ import { useFlip } from "../useFlip";
 import { ArvoreAnimada } from "./ArvoreAnimada";
 import { ComparacaoArvores } from "./ComparacaoArvores";
 import { DesenhoArvore, NoDesenho, fotografar } from "./DesenhoArvore";
+import { ListaCompleta, mapearLista } from "./ListaCompleta";
 import { ControlesPasso, usePassoAPasso } from "./PassoAPasso";
 
 type Aba = "lista" | "saltos" | "arvore";
@@ -228,6 +229,13 @@ function AbaSaltos({ genero }: Props) {
     return { colunas, trilha };
   }, [lista, classica, truncada]);
 
+  // para o desenho da lista inteira: a posição de cada nó e o caminho em posições
+  const mapa = useMemo(() => mapearLista(lista), [lista]);
+  const caminhoNaLista = trilha.map((t) => ({
+    pos: t.c === 0 ? -1 : mapa.posicao.get(colunas[t.c])!,
+    nivel: t.n,
+  }));
+
   // animação do caminho: a cada passo a busca anda uma casa
   const busca = usePassoAPasso(trilha.length, `${ano}:${nivelMinimo}`, { intervalo: 420 });
   const ordem = new Map(trilha.map((t, i) => [`${t.c}:${t.n}`, i]));
@@ -319,6 +327,24 @@ function AbaSaltos({ genero }: Props) {
 
           <ControlesPasso anim={busca} texto={textoBusca} />
 
+          <h4 className="titulo-desenho">A lista inteira, da cabeça ao fim</h4>
+          <ListaCompleta
+            lista={lista}
+            porNivel={mapa.porNivel}
+            caminho={caminhoNaLista}
+            passo={busca.passo}
+            nivelMinimo={nivelMinimo}
+            alvoClassica={busca.terminou && classica.no ? classica.posicao : null}
+            alvoTruncada={truncadaPronta && truncada.no ? truncada.posicao : null}
+          />
+          <p className="dica">
+            Cada linha é um nível: uma lista encadeada que sai da cabeça e vai até o fim. Cada risco
+            é um filme que existe naquele nível, na posição dele na ordem cronológica. Nos níveis de
+            baixo há tantos filmes que os riscos se juntam em uma barra. O número à direita é a
+            quantidade de filmes do nível. A linha colorida é o caminho da busca.
+          </p>
+
+          <h4 className="titulo-desenho">Zoom: só os nós em que a busca pisou</h4>
           <div className="caminho">
             <div className="coluna rotulos">
               {niveis.map((n) => (
@@ -367,8 +393,8 @@ function AbaSaltos({ genero }: Props) {
             <span className="amostra alvo-truncada" /> resultado da truncada
           </p>
           <p className="dica">
-            O desenho mostra só os nós em que a busca pisou; entre uma coluna e outra há filmes que
-            foram pulados.
+            O zoom mostra só os nós em que a busca pisou, com a torre de cada um; entre uma coluna e
+            outra há filmes que foram pulados, como dá para ver no desenho da lista inteira.
           </p>
 
           <div className="numeros">

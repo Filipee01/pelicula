@@ -814,3 +814,81 @@
   color: var(--suave);
   font-size: 13.5px;
 }
+
+/* desenho da lista com saltos inteira, da cabeça ao fim */
+.titulo-desenho {
+  margin: 4px 0 -6px;
+  font: 700 16px var(--titulo);
+}
+.lista-completa {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  background: var(--fundo);
+}
+.lista-completa .sentinela {
+  fill: #59607a;
+}
+.lista-completa .nome-sentinela {
+  fill: var(--texto);
+  font: 600 13px var(--corpo);
+  text-anchor: middle;
+}
+.lista-completa .rotulo-nivel {
+  fill: var(--suave);
+  font: 12.5px var(--corpo);
+  text-anchor: end;
+}
+.lista-completa .contagem-nivel {
+  fill: var(--suave);
+  font: 12.5px var(--corpo);
+  font-variant-numeric: tabular-nums;
+}
+.lista-completa .fio {
+  stroke: #2b3044;
+  stroke-width: 1;
+}
+.lista-completa .seta {
+  fill: #59607a;
+}
+.lista-completa .risco {
+  fill: #8a93b4;
+}
+.lista-completa .muitos {
+  fill: #4a5270;
+}
+.lista-completa .marca-ano {
+  stroke: var(--fraco);
+  stroke-width: 1;
+}
+.lista-completa .ano {
+  fill: var(--suave);
+  font: 12px var(--corpo);
+  text-anchor: middle;
+}
+.lista-completa .trecho {
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.lista-completa .trecho.comum {
+  stroke: var(--destaque);
+}
+.lista-completa .trecho.so-classica {
+  stroke: #8f9ac4;
+}
+.lista-completa .alvo {
+  stroke: var(--fundo);
+  stroke-width: 2;
+}
+.lista-completa .alvo.classica {
+  fill: #e8ebf7;
+}
+.lista-completa .alvo.truncada {
+  fill: var(--ouro);
+}
+.lista-completa .marcador {
+  fill: #fff;
+  stroke: var(--destaque);
+  stroke-width: 2;
+}

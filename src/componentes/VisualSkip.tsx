@@ -17,6 +17,8 @@ export function VisualSkip({ lista, nivel, inicio }: Props) {
 
   const niveis = Array.from({ length: lista.niveis }, (_, i) => lista.niveis - 1 - i);
   const noComeco = inicio === lista.primeiro(0);
+  // o desenho é uma janela da lista: depois do último nó mostrado ou ela continua ou acaba
+  const chegouAoFim = nos[nos.length - 1].prox[0] === null;
 
   return (
     <details className="visual-skip" open>
@@ -24,7 +26,7 @@ export function VisualSkip({ lista, nivel, inicio }: Props) {
         Lista com saltos por dentro
         <span>
           cada coluna é um filme, cada linha um nível; o nível {nivel} (em destaque) é o que está
-          na tela
+          na tela. É uma janela da lista: “⋯” indica que ela continua
         </span>
       </summary>
       <div className="torres">
@@ -38,7 +40,7 @@ export function VisualSkip({ lista, nivel, inicio }: Props) {
         </div>
         <div className="coluna">
           {niveis.map((n) => (
-            <i key={n} className={`cheia cabeca ${n === nivel ? "ativa" : ""}`} />
+            <i key={n} className={noComeco ? `cheia cabeca ${n === nivel ? "ativa" : ""}` : ""} />
           ))}
           <small>{noComeco ? "início" : "⋯"}</small>
         </div>
@@ -57,6 +59,12 @@ export function VisualSkip({ lista, nivel, inicio }: Props) {
             <small>{no.valor.ano}</small>
           </div>
         ))}
+        <div className="coluna" title={chegouAoFim ? "fim da lista" : "a lista continua"}>
+          {niveis.map((n) => (
+            <i key={n} className={chegouAoFim ? "cheia cabeca" : ""} />
+          ))}
+          <small>{chegouAoFim ? "fim" : "⋯"}</small>
+        </div>
       </div>
     </details>
   );
