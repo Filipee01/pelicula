@@ -8,7 +8,7 @@ import { useFlip } from "../useFlip";
 import { ArvoreAnimada } from "./ArvoreAnimada";
 import { ComparacaoArvores } from "./ComparacaoArvores";
 import { DesenhoArvore, NoDesenho, fotografar } from "./DesenhoArvore";
-import { ListaCompleta, mapearLista } from "./ListaCompleta";
+import { ListaPontas } from "./ListaPontas";
 import { ControlesPasso, usePassoAPasso } from "./PassoAPasso";
 
 type Aba = "lista" | "saltos" | "arvore";
@@ -229,13 +229,6 @@ function AbaSaltos({ genero }: Props) {
     return { colunas, trilha };
   }, [lista, classica, truncada]);
 
-  // para o desenho da lista inteira: a posição de cada nó e o caminho em posições
-  const mapa = useMemo(() => mapearLista(lista), [lista]);
-  const caminhoNaLista = trilha.map((t) => ({
-    pos: t.c === 0 ? -1 : mapa.posicao.get(colunas[t.c])!,
-    nivel: t.n,
-  }));
-
   // animação do caminho: a cada passo a busca anda uma casa
   const busca = usePassoAPasso(trilha.length, `${ano}:${nivelMinimo}`, { intervalo: 420 });
   const ordem = new Map(trilha.map((t, i) => [`${t.c}:${t.n}`, i]));
@@ -327,21 +320,15 @@ function AbaSaltos({ genero }: Props) {
 
           <ControlesPasso anim={busca} texto={textoBusca} />
 
-          <h4 className="titulo-desenho">A lista inteira, da cabeça ao fim</h4>
-          <ListaCompleta
-            lista={lista}
-            porNivel={mapa.porNivel}
-            caminho={caminhoNaLista}
-            passo={busca.passo}
-            nivelMinimo={nivelMinimo}
-            alvoClassica={busca.terminou && classica.no ? classica.posicao : null}
-            alvoTruncada={truncadaPronta && truncada.no ? truncada.posicao : null}
-          />
+          <h4 className="titulo-desenho">
+            A lista, da cabeça ao fim: os 10 primeiros e os 10 últimos filmes
+          </h4>
+          <ListaPontas lista={lista} nivelDestacado={nivelMinimo} />
           <p className="dica">
-            Cada linha é um nível: uma lista encadeada que sai da cabeça e vai até o fim. Cada risco
-            é um filme que existe naquele nível, na posição dele na ordem cronológica. Nos níveis de
-            baixo há tantos filmes que os riscos se juntam em uma barra. O número à direita é a
-            quantidade de filmes do nível. A linha colorida é o caminho da busca.
+            Cada coluna é um filme, e a altura dela é a torre sorteada. As setas são os ponteiros de
+            cada nível: saem da cabeça, passam pelos filmes que têm andar naquele nível e chegam ao
+            fim. A reticência no meio são os outros filmes da lista, que não cabem no desenho. A
+            linha em destaque é o nível mínimo escolhido acima.
           </p>
 
           <h4 className="titulo-desenho">Zoom: só os nós em que a busca pisou</h4>
@@ -394,7 +381,7 @@ function AbaSaltos({ genero }: Props) {
           </p>
           <p className="dica">
             O zoom mostra só os nós em que a busca pisou, com a torre de cada um; entre uma coluna e
-            outra há filmes que foram pulados, como dá para ver no desenho da lista inteira.
+            outra há filmes que foram pulados.
           </p>
 
           <div className="numeros">

@@ -815,80 +815,74 @@
   font-size: 13.5px;
 }
 
-/* desenho da lista com saltos inteira, da cabeça ao fim */
+/* desenho da lista com saltos da cabeça ao fim (as duas pontas e reticência no meio) */
 .titulo-desenho {
   margin: 4px 0 -6px;
   font: 700 16px var(--titulo);
 }
-.lista-completa {
+.lista-pontas {
   display: block;
   width: 100%;
   height: auto;
+  padding: 6px 0;
   border-radius: 12px;
   background: var(--fundo);
 }
-.lista-completa .sentinela {
-  fill: #59607a;
-}
-.lista-completa .nome-sentinela {
-  fill: var(--texto);
-  font: 600 13px var(--corpo);
-  text-anchor: middle;
-}
-.lista-completa .rotulo-nivel {
-  fill: var(--suave);
-  font: 12.5px var(--corpo);
+.lista-pontas .rotulo-nivel {
+  fill: var(--fraco);
+  font: 11.5px var(--corpo);
   text-anchor: end;
 }
-.lista-completa .contagem-nivel {
-  fill: var(--suave);
-  font: 12.5px var(--corpo);
-  font-variant-numeric: tabular-nums;
+.lista-pontas .destacado .rotulo-nivel {
+  fill: var(--destaque);
+  font-weight: 700;
 }
-.lista-completa .fio {
-  stroke: #2b3044;
-  stroke-width: 1;
-}
-.lista-completa .seta {
-  fill: #59607a;
-}
-.lista-completa .risco {
-  fill: #8a93b4;
-}
-.lista-completa .muitos {
+.lista-pontas .andar {
   fill: #4a5270;
 }
-.lista-completa .marca-ano {
-  stroke: var(--fraco);
-  stroke-width: 1;
+.lista-pontas .andar.sentinela {
+  fill: #6a7396;
 }
-.lista-completa .ano {
+.lista-pontas .destacado .andar {
+  fill: var(--destaque);
+}
+.lista-pontas .ponteiro {
+  stroke: #5a6385;
+  stroke-width: 1.3;
+}
+.lista-pontas .ponta-seta {
+  fill: #5a6385;
+}
+.lista-pontas .destacado .ponteiro {
+  stroke: var(--destaque);
+  stroke-width: 2;
+}
+.lista-pontas .destacado .ponta-seta {
+  fill: var(--destaque);
+}
+.lista-pontas .reticencia {
   fill: var(--suave);
-  font: 12px var(--corpo);
+  font: 700 16px var(--corpo);
   text-anchor: middle;
 }
-.lista-completa .trecho {
-  stroke-width: 3;
-  stroke-linecap: round;
+.lista-pontas .ano {
+  fill: var(--suave);
+  font: 11px var(--corpo);
+  text-anchor: middle;
 }
-.lista-completa .trecho.comum {
-  stroke: var(--destaque);
+.lista-pontas .posicao {
+  fill: var(--fraco);
+  font: 10px var(--corpo);
+  text-anchor: middle;
+  font-variant-numeric: tabular-nums;
 }
-.lista-completa .trecho.so-classica {
-  stroke: #8f9ac4;
+.lista-pontas .nome-ponta {
+  fill: var(--texto);
+  font: 600 12.5px var(--corpo);
+  text-anchor: middle;
 }
-.lista-completa .alvo {
-  stroke: var(--fundo);
-  stroke-width: 2;
-}
-.lista-completa .alvo.classica {
-  fill: #e8ebf7;
-}
-.lista-completa .alvo.truncada {
-  fill: var(--ouro);
-}
-.lista-completa .marcador {
-  fill: #fff;
-  stroke: var(--destaque);
-  stroke-width: 2;
+.lista-pontas .no-meio {
+  fill: var(--suave);
+  font: 11px var(--corpo);
+  text-anchor: middle;
 }
