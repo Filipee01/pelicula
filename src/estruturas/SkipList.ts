@@ -208,6 +208,7 @@ export class SkipList<T> {
     return x;
   }
 
+  // MODIFICAÇÃO 3: o primeiro nó do nível escolhido (é por onde a navegação começa)
   primeiro(nivel = 0): NoSkip<T> | null {
     return nivel < this.niveis ? this.cabeca.prox[nivel] : null;
   }

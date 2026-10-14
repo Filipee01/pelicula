@@ -55,7 +55,7 @@ todas, é só buscar por `MODIFICAÇÃO` na pasta `src/` (no VS Code, Ctrl+Shift
 | --- | --- | --- | --- |
 | 1 | Busca truncada | Lista com saltos | `SkipList.ts`, método `buscar` |
 | 2 | Lista indexada (larguras) | Lista com saltos | `SkipList.ts`, campo `largura`, métodos `inserir`, `buscar`, `localizar` e `porPosicao` |
-| 3 | Navegação por nível | Lista com saltos | `SkipList.ts`, método `percorrer` e campo `nosPorNivel` |
+| 3 | Navegação por nível | Lista com saltos | `SkipList.ts`, métodos `primeiro` e `percorrer` e campo `nosPorNivel` |
 | 4 | Consulta por prefixo sem afunilar | Árvore afunilada | `ArvoreSplay.ts`, método `aPartirDe` |
 | 5 | Várias chaves por filme | Árvore afunilada | `dados.ts`, função `chavesDoFilme` |
 
