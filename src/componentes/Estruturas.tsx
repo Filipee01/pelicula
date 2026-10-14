@@ -3,7 +3,7 @@ import { numero } from "../App";
 import { Acervo, Filme, Genero, aPartirDoAno, normalizar, urlPoster } from "../dados";
 import { OperacaoSplay, PassoSplay, QuadroSplay } from "../estruturas/ArvoreSplay";
 import { AcessoLista } from "../estruturas/ListaMTF";
-import { NoSkip, Salto } from "../estruturas/SkipList";
+import { Salto } from "../estruturas/SkipList";
 import { useFlip } from "../useFlip";
 import { ArvoreAnimada } from "./ArvoreAnimada";
 import { ComparacaoArvores } from "./ComparacaoArvores";
@@ -210,30 +210,25 @@ function AbaSaltos({ genero }: Props) {
     [lista, ano, nivelMinimo],
   );
 
-  // Colunas do desenho: a cabeça, cada nó em que a busca pisou e os dois resultados.
-  // A trilha é o caminho da busca clássica, casa por casa (coluna, nível), na ordem em
-  // que a busca passa: descendo um nível ou avançando para o próximo nó.
-  const { colunas, trilha } = useMemo(() => {
-    const colunas: NoSkip<Filme>[] = [lista.cabeca];
+  // A trilha é o caminho da busca clássica, casa por casa (nó e nível), na ordem em que
+  // a busca passa: descendo um nível ou avançando para o próximo nó.
+  const trilha = useMemo(() => {
+    let no = lista.cabeca;
     let nivelAtual = lista.niveis - 1;
-    const trilha = [{ c: 0, n: nivelAtual }];
-    for (const { nivel, no } of classica.visitas) {
-      while (nivelAtual > nivel) trilha.push({ c: colunas.length - 1, n: --nivelAtual });
-      colunas.push(no);
-      trilha.push({ c: colunas.length - 1, n: nivel });
+    const trilha = [{ no, nivel: nivelAtual }];
+    for (const visita of classica.visitas) {
+      while (nivelAtual > visita.nivel) trilha.push({ no, nivel: --nivelAtual });
+      no = visita.no;
+      trilha.push({ no, nivel: visita.nivel });
     }
-    while (nivelAtual > 0) trilha.push({ c: colunas.length - 1, n: --nivelAtual });
-    for (const alvo of [classica.no, truncada.no]) {
-      if (alvo && !colunas.includes(alvo)) colunas.push(alvo);
-    }
-    return { colunas, trilha };
-  }, [lista, classica, truncada]);
+    while (nivelAtual > 0) trilha.push({ no, nivel: --nivelAtual });
+    return trilha;
+  }, [lista, classica]);
 
   // animação do caminho: a cada passo a busca anda uma casa
   const busca = usePassoAPasso(trilha.length, `${ano}:${nivelMinimo}`, { intervalo: 420 });
-  const ordem = new Map(trilha.map((t, i) => [`${t.c}:${t.n}`, i]));
   // a truncada termina quando a trilha desce abaixo do nível mínimo
-  const parada = trilha.findIndex((t) => t.n < nivelMinimo);
+  const parada = trilha.findIndex((t) => t.nivel < nivelMinimo);
   const fimTruncada = parada === -1 ? trilha.length : parada;
   const truncadaPronta = busca.passo >= fimTruncada;
   const textoBusca = busca.terminou
@@ -255,7 +250,6 @@ function AbaSaltos({ genero }: Props) {
     [lista],
   );
 
-  const niveis = Array.from({ length: lista.niveis }, (_, i) => lista.niveis - 1 - i);
   const saltos: Salto[] = [];
   const noK = lista.porPosicao(k - 1, saltos);
   // animação dos saltos: aparecem um por um, com a soma das larguras crescendo
@@ -290,17 +284,6 @@ function AbaSaltos({ genero }: Props) {
       </aside>
 
       <div className="palco">
-        {/* quadro próprio, para os botões da busca ficarem colados nas torres animadas */}
-        <Demonstracao titulo="A lista, da cabeça ao fim: os 10 primeiros e os 10 últimos filmes">
-          <ListaPontas lista={lista} nivelDestacado={nivelMinimo} />
-          <p className="dica">
-            Cada coluna é um filme, e a altura dela é a torre sorteada. As setas são os ponteiros de
-            cada nível: saem da cabeça, passam pelos filmes que têm andar naquele nível e chegam ao
-            fim. A reticência no meio são os outros filmes da lista, que não cabem no desenho. A
-            linha em destaque é o nível mínimo escolhido na busca logo abaixo.
-          </p>
-        </Demonstracao>
-
         <Demonstracao titulo="1 · Buscar o primeiro filme a partir de um ano">
           <div className="ajustes">
             <label>
@@ -331,47 +314,16 @@ function AbaSaltos({ genero }: Props) {
 
           <ControlesPasso anim={busca} texto={textoBusca} />
 
-          <div className="caminho">
-            <div className="coluna rotulos">
-              {niveis.map((n) => (
-                <i key={n} className={n === nivelMinimo ? "atual" : ""}>
-                  {n}
-                </i>
-              ))}
-              <small>nível</small>
-            </div>
-            {colunas.map((no, c) => {
-              const ehCabeca = c === 0;
-              const papel =
-                no === truncada.no && truncadaPronta
-                  ? "alvo-truncada"
-                  : no === classica.no && busca.terminou
-                    ? "alvo-classica"
-                    : "";
-              return (
-                <div
-                  key={c}
-                  className={`coluna ${papel}`}
-                  title={ehCabeca ? "cabeça da lista" : `${no.valor.titulo} (${no.valor.ano})`}
-                >
-                  {niveis.map((n) => {
-                    if (no.altura <= n) return <i key={n} />;
-                    const indice = ordem.get(`${c}:${n}`);
-                    const pisou = indice !== undefined && indice < busca.passo;
-                    const classe = !pisou ? "" : n >= nivelMinimo ? "comum" : "so-classica";
-                    const aqui = !busca.terminou && indice === busca.passo - 1;
-                    return <i key={n} className={`cheia ${classe} ${aqui ? "marcador" : ""}`} />;
-                  })}
-                  <small>{ehCabeca ? "início" : no.valor.ano}</small>
-                  {ehCabeca ? (
-                    <span className="mini" />
-                  ) : (
-                    <img className="mini" src={urlPoster(no.valor, 92)} alt="" />
-                  )}
-                </div>
-              );
-            })}
-          </div>
+          <ListaPontas
+            lista={lista}
+            trilha={trilha}
+            passo={busca.passo}
+            nivelMinimo={nivelMinimo}
+            resultadoClassica={classica.no}
+            resultadoTruncada={truncada.no}
+            classicaPronta={busca.terminou}
+            truncadaPronta={truncadaPronta}
+          />
           <p className="legenda-caminho">
             <span className="amostra comum" /> caminho até o nível {nivelMinimo} (as duas buscas)
             <span className="amostra so-classica" /> o que só a clássica percorre
@@ -379,8 +331,10 @@ function AbaSaltos({ genero }: Props) {
             <span className="amostra alvo-truncada" /> resultado da truncada
           </p>
           <p className="dica">
-            O desenho mostra só os nós em que a busca pisou, com a torre de cada um; entre uma coluna
-            e outra há filmes que foram pulados.
+            A lista vai da cabeça ao fim. Aparecem os 10 primeiros filmes, os filmes em que a busca
+            pisou, os dois resultados e os 10 últimos; cada reticência diz quantos filmes ficaram escondidos ali. Cada
+            coluna é um filme e a altura é a torre dele. A seta contínua é um ponteiro direto entre
+            dois filmes do desenho; a tracejada indica que há filmes escondidos no caminho.
           </p>
 
           <div className="numeros">
