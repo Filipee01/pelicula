@@ -64,5 +64,4 @@ src/App.tsx                 estado da aplicação e faixa de gêneros
 src/componentes/            as telas (catálogo, busca, ficha do filme e tela "Estruturas")
 ```
 
-O projeto foi desenvolvido em TypeScript com React e Vite, com auxílio de um LLM (Claude Code) e .
-Tudo roda no navegador, sem servidor.
+O projeto foi desenvolvido em TypeScript com React e Vite, com auxílio de um LLM (Claude Code) e Chat Gpt para a melhoria dos prompts.
