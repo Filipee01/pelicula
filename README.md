@@ -163,7 +163,6 @@ Requisito: Node 20+.
 ```bash
 npm install
 npm run dev      # abre em http://localhost:5173
-npm test         # testes das estruturas de dados
 ```
 
 Para gerar a base de novo (opcional, exige Python 3.10+, sem bibliotecas extras):
@@ -176,7 +175,7 @@ python scripts/preparar_dados.py
 
 ```
 scripts/preparar_dados.py     download (Kaggle) e conversão da base
-src/estruturas/               as estruturas de dados e seus testes (inclui a AVL de referência)
+src/estruturas/               as estruturas de dados (inclui a AVL de referência)
 src/comparacao.ts             mesmos acessos na árvore afunilada e na AVL
 src/dados.ts                  carrega o JSON e monta as estruturas
 src/App.tsx                   estado da aplicação e faixa de gêneros
@@ -202,8 +201,8 @@ e dá para desenhá-las ao vivo.
 1. Escolha da base: comparamos bases do Kaggle com imagens (arte, filmes, animes, músicas,
    astronomia, cartas) e ficamos com a de filmes, pela quantidade de dados e pelo apelo visual
    dos pôsteres e imagens de fundo.
-2. Estruturas primeiro: as listas e a árvore foram escritas e testadas isoladamente (16 testes
-   com Vitest, comparando com resultados calculados por força bruta).
+2. Estruturas primeiro: as listas e a árvore foram escritas antes da interface e
+   conferidas isoladamente, comparando com resultados calculados por força bruta.
 3. Interface depois: cada funcionalidade foi desenhada a partir do que a estrutura oferece (os
    níveis viram a "profundidade", o topo da árvore vira a vitrine de filmes abertos).
 4. Verificação: a aplicação foi exercitada em um Chrome automatizado (troca de gênero, níveis,
