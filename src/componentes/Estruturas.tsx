@@ -290,6 +290,17 @@ function AbaSaltos({ genero }: Props) {
       </aside>
 
       <div className="palco">
+        {/* quadro próprio, para os botões da busca ficarem colados nas torres animadas */}
+        <Demonstracao titulo="A lista, da cabeça ao fim: os 10 primeiros e os 10 últimos filmes">
+          <ListaPontas lista={lista} nivelDestacado={nivelMinimo} />
+          <p className="dica">
+            Cada coluna é um filme, e a altura dela é a torre sorteada. As setas são os ponteiros de
+            cada nível: saem da cabeça, passam pelos filmes que têm andar naquele nível e chegam ao
+            fim. A reticência no meio são os outros filmes da lista, que não cabem no desenho. A
+            linha em destaque é o nível mínimo escolhido na busca logo abaixo.
+          </p>
+        </Demonstracao>
+
         <Demonstracao titulo="1 · Buscar o primeiro filme a partir de um ano">
           <div className="ajustes">
             <label>
@@ -320,18 +331,6 @@ function AbaSaltos({ genero }: Props) {
 
           <ControlesPasso anim={busca} texto={textoBusca} />
 
-          <h4 className="titulo-desenho">
-            A lista, da cabeça ao fim: os 10 primeiros e os 10 últimos filmes
-          </h4>
-          <ListaPontas lista={lista} nivelDestacado={nivelMinimo} />
-          <p className="dica">
-            Cada coluna é um filme, e a altura dela é a torre sorteada. As setas são os ponteiros de
-            cada nível: saem da cabeça, passam pelos filmes que têm andar naquele nível e chegam ao
-            fim. A reticência no meio são os outros filmes da lista, que não cabem no desenho. A
-            linha em destaque é o nível mínimo escolhido acima.
-          </p>
-
-          <h4 className="titulo-desenho">Zoom: só os nós em que a busca pisou</h4>
           <div className="caminho">
             <div className="coluna rotulos">
               {niveis.map((n) => (
@@ -380,8 +379,8 @@ function AbaSaltos({ genero }: Props) {
             <span className="amostra alvo-truncada" /> resultado da truncada
           </p>
           <p className="dica">
-            O zoom mostra só os nós em que a busca pisou, com a torre de cada um; entre uma coluna e
-            outra há filmes que foram pulados.
+            O desenho mostra só os nós em que a busca pisou, com a torre de cada um; entre uma coluna
+            e outra há filmes que foram pulados.
           </p>
 
           <div className="numeros">
